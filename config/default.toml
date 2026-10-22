@@ -1,0 +1,18 @@
+[app]
+name = "pdf-reader"
+version = "0.9.4"
+theme = "dark"
+recent_limit = 20
+
+[render]
+dpi = 144
+cache_pages = 12
+antialias = true
+
+[search]
+case_sensitive = false
+max_results = 500
+
+[annotate]
+highlight_color = "#ffd54f"
+store_path = "~/.pdf-reader/annotations.db"
