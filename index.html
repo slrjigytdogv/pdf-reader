@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Reader — Fast Desktop PDF Viewer for Windows, macOS & Linux</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --navy: #0a0e27;
+    --indigo: #1a1a4e;
+    --charcoal: #14161f;
+    --accent: #6366f1;
+    --accent2: #22d3ee;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --card: rgba(255, 255, 255, 0.04);
+    --border: rgba(255, 255, 255, 0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(160deg, #0a0e27 0%, #14163a 35%, #1a1a4e 60%, #0f1220 100%);
+    background-attachment: fixed;
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 14, 39, 0.55);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, #a5b4fc, #22d3ee);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand span { font-size: 1.3rem; -webkit-text-fill-color: initial; }
+
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: #fff; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #22d3ee);
+    color: #fff;
+    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.55);
+  }
+
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .nav-cta {
+    padding: 10px 20px;
+    font-size: 0.88rem;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    text-align: center;
+    padding: 96px 0 72px;
+    position: relative;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 65%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 18px;
+    border-radius: 999px;
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    color: #a5b4fc;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin-bottom: 28px;
+  }
+
+  .pill::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22d3ee;
+    box-shadow: 0 0 10px #22d3ee;
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 22px;
+    background: linear-gradient(110deg, #ffffff 10%, #a5b4fc 45%, #22d3ee 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero p {
+    max-width: 620px;
+    margin: 0 auto 36px;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 56px;
+  }
+
+  .hero-actions .btn { padding: 15px 32px; font-size: 1rem; }
+
+  .stats {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 22px;
+    min-width: 130px;
+    backdrop-filter: blur(8px);
+  }
+
+  .stat-chip strong {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .stat-chip small {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section { padding: 72px 0; }
+
+  .section-head {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .section-head p {
+    color: var(--muted);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* ---------- FEATURES ---------- */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+
+  .feature-card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px 26px;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #6366f1, #22d3ee);
+    opacity: 0.85;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(99, 102, 241, 0.45);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .feature-icon {
+    font-size: 1.9rem;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+
+  .feature-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+  }
+
+  .feature-card p {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .steps {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .steps::before {
+    content: "";
+    position: absolute;
+    left: 27px;
+    top: 20px;
+    bottom: 20px;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #6366f1, #22d3ee, #6366f1);
+  }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 18px 0;
+    position: relative;
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1, #22d3ee);
+    box-shadow: 0 0 0 6px rgba(10, 14, 39, 1), 0 8px 24px rgba(99, 102, 241, 0.4);
+    z-index: 1;
+  }
+
+  .step-body { padding-top: 6px; }
+
+  .step-body h3 {
+    font-size: 1.12rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+
+  .step-body p {
+    color: var(--muted);
+    font-size: 0.94rem;
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq-list {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  details {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  details[open] { border-color: rgba(99, 102, 241, 0.4); }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+    list-style: none;
+    user-select: none;
+  }
+
+  summary::-webkit-details-marker { display: none; }
+
+  .faq-icon {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    position: relative;
+    transition: transform 0.25s ease;
+  }
+
+  .faq-icon::before,
+  .faq-icon::after {
+    content: "";
+    position: absolute;
+    background: #a5b4fc;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .faq-icon::before { width: 14px; height: 2.5px; }
+  .faq-icon::after { width: 2.5px; height: 14px; transition: opacity 0.2s; }
+
+  details[open] .faq-icon { transform: rotate(45deg); }
+
+  .faq-answer {
+    padding: 0 22px 20px;
+    color: var(--muted);
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+
+  /* ---------- CTA BANNER ---------- */
+  .cta-banner {
+    position: relative;
+    text-align: center;
+    padding: 64px 32px;
+    border-radius: 24px;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    background: rgba(20, 22, 58, 0.7);
+    overflow: hidden;
+  }
+
+  .cta-banner::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 900px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.35), rgba(34, 211, 238, 0.12) 45%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-banner > * { position: relative; z-index: 1; }
+
+  .cta-banner h2 {
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+
+  .cta-banner p {
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto 30px;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    margin-top: 24px;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.88rem;
+    color: var(--muted);
+  }
+
+  .footer-inner a {
+    color: #a5b4fc;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .footer-inner a:hover { text-decoration: underline; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 900px) {
+    .features-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+
+    .hero { padding: 64px 0 48px; }
+
+    .hero-actions { flex-direction: column; align-items: stretch; }
+    .hero-actions .btn { width: 100%; }
+
+    .stat-chip { flex: 1 1 calc(50% - 14px); min-width: 0; }
+
+    .features-grid { grid-template-columns: 1fr; }
+
+    .steps::before { left: 24px; }
+
+    .step-num { width: 50px; height: 50px; font-size: 1.05rem; }
+
+    .footer-inner { flex-direction: column; text-align: center; }
+
+    section { padding: 52px 0; }
+
+    .cta-banner { padding: 48px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><span>📄</span> pdf-reader</div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <a class="btn btn-primary nav-cta" href="https://gitscore.cc">Download</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div class="pill">PDF Reader · Desktop Viewer</div>
+    <h1>Read, Search & Annotate Every PDF — Fast.</h1>
+    <p>PDF Reader renders documents instantly, extracts text, searches across every page, and lets you annotate and bookmark — a fast, native desktop viewer for Windows, macOS, and Linux.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="https://gitscore.cc">⬇ Download for Windows</a>
+      <a class="btn btn-ghost" href="https://gitscore.cc">★ View on GitHub</a>
+    </div>
+    <div class="stats">
+      <div class="stat-chip"><strong>48,000+</strong><small>Downloads</small></div>
+      <div class="stat-chip"><strong>v2.4.1</strong><small>Latest Release</small></div>
+      <div class="stat-chip"><strong>Windows 10 / 11</strong><small>Fully Supported</small></div>
+      <div class="stat-chip"><strong>Free &amp; Open Source</strong><small>MIT License</small></div>
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <h2>Everything you need in a PDF viewer</h2>
+      <p>Built for speed and precision — no bloat, no subscriptions, no telemetry.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Instant Rendering</h3>
+        <p>Hardware-accelerated rendering opens large PDFs in a fraction of a second — even documents with hundreds of pages.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Full-Text Search</h3>
+        <p>Search across every page at once with highlighted matches, result previews, and instant jump-to-page navigation.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Text Extraction</h3>
+        <p>Select, copy, and export text from any PDF. Extract entire documents or just the sections you need to a clean text file.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖍️</div>
+        <h3>Annotations</h3>
+        <p>Highlight, underline, strikethrough, and add sticky notes. Every annotation is saved and synced to the file.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔖</div>
+        <h3>Smart Bookmarks</h3>
+        <p>Bookmark pages with custom labels, organize them into folders, and pick up exactly where you left off on reopen.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🖥️</div>
+        <h3>Cross-Platform</h3>
+        <p>One codebase, native builds for Windows, macOS, and Linux. Same shortcuts, same performance, everywhere.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-head">
+      <h2>How it works</h2>
+      <p>From download to annotation in under a minute.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Download &amp; install</h3>
+          <p>Grab the installer from gitscore.cc and run it. No dependencies, no bundled extras — just the viewer.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Open any PDF</h3>
+          <p>Drag and drop a file, use the file picker, or set pdf-reader as your default handler. Rendering starts instantly.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Search, annotate, bookmark</h3>
+          <p>Search across pages, highlight what matters, and save bookmarks. Everything persists with the document.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="section-head">
+      <h2>Frequently asked questions</h2>
+      <p>Quick answers about the PDF Reader desktop app.</p>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>Is PDF Reader really free? <span class="faq-icon"></span></summary>
+        <div class="faq-answer">Yes. pdf-reader is free and open source under the MIT license. There are no premium tiers, watermarks, or feature locks — every feature is included.</div>
+      </details>
+      <details>
+        <summary>Which operating systems are supported? <span class="faq-icon"></span></summary>
+        <div class="faq-answer">Native builds are available for Windows 10 and 11, macOS (Intel and Apple Silicon), and Linux distributions including Ubuntu, Fedora, and Arch.</div>
+      </details>
+      <details>
+        <summary>Does it handle very large PDF files? <span class="faq-icon"></span></summary>
+        <div class="faq-answer">Yes. PDF Reader uses lazy page loading and hardware-accelerated rendering, so documents with thousands of pages open quickly and scroll smoothly without freezing.</div>
+      </details>
+      <details>
+        <summary>Are my annotations and bookmarks saved? <span class="faq-icon"></span></summary>
+        <div class="faq-answer">Absolutely. Annotations are written back into the PDF file itself, and bookmarks are stored in a local sidecar file next to the document — so they travel with your files.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <div class="cta-banner">
+      <h2>Get PDF Reader today</h2>
+      <p>Join 48,000+ users who replaced slow, bloated viewers with a fast, open-source desktop reader.</p>
+      <a class="btn btn-primary" href="https://gitscore.cc" style="padding:15px 34px;font-size:1rem;">⬇ Download Free</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div>© 2025 pdf-reader. Free &amp; open source under the MIT license.</div>
+    <div><a href="https://gitscore.cc">GitHub →</a></div>
+  </div>
+</footer>
+
+</body>
+</html>
