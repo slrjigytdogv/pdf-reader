@@ -1,0 +1,9 @@
+{
+  "next_page": ["space", "j", "PageDown"],
+  "prev_page": ["k", "PageUp"],
+  "zoom_in": ["+"],
+  "zoom_out": ["-"],
+  "toggle_sidebar": ["Tab"],
+  "search": ["ctrl+f"],
+  "annotate_highlight": ["h"]
+}
