@@ -1,0 +1,10 @@
+# PDF Reader — runtime dependencies (Python 3.11+)
+pypdf==4.3.1
+pdfminer.six==20240706
+Pillow==10.4.0
+PyMuPDF==1.24.9
+watchdog==4.0.1
+click==8.1.7
+pydantic==2.8.2
+python-dotenv==1.0.1
+pytest==8.3.2
